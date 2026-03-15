@@ -65,7 +65,7 @@ body {
 
 .enter-btn {
   margin-top: 50px;
-  width: 170px;
+  width: 140px;
   height: 50px;
   border: none;
   border-radius: 25px;
@@ -103,6 +103,14 @@ body {
   justify-content: center;
   z-index: 5;
   background: #000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease;
+}
+
+.passcode-screen.active {
+  opacity: 1;
+  visibility: visible;
 }
 
 .passcode-label {
@@ -236,6 +244,7 @@ const lock = document.getElementById('lockScreen');
 
 function showPasscode() {
   lock.classList.add('swiped');
+  document.getElementById('passcodeScreen').classList.add('active');
 }
 
 // Numpad
