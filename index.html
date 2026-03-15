@@ -358,7 +358,7 @@ body {
     <button class="num-btn" data-num="7">7</button>
     <button class="num-btn" data-num="8">8</button>
     <button class="num-btn" data-num="9">9</button>
-    <button class="num-btn empty"></button>
+    <button class="num-btn delete" data-action="cancel">Cancel</button>
     <button class="num-btn" data-num="0">0</button>
     <button class="num-btn delete" data-action="del">Delete</button>
   </div>
@@ -408,6 +408,7 @@ document.querySelectorAll('.num-btn').forEach(function(btn) {
     var action = btn.getAttribute('data-action');
     if (num !== null) press(parseInt(num));
     if (action === 'del') del();
+    if (action === 'cancel') { code = ''; updateDots(); document.getElementById('passcodeScreen').classList.remove('active'); document.getElementById('lockScreen').classList.remove('swiped'); }
   }, { passive: true });
 
   btn.addEventListener('touchend', function() {
@@ -420,6 +421,7 @@ document.querySelectorAll('.num-btn').forEach(function(btn) {
     var action = btn.getAttribute('data-action');
     if (num !== null) press(parseInt(num));
     if (action === 'del') del();
+    if (action === 'cancel') { code = ''; updateDots(); document.getElementById('passcodeScreen').classList.remove('active'); document.getElementById('lockScreen').classList.remove('swiped'); }
   });
 
   btn.addEventListener('mouseup', function() {
