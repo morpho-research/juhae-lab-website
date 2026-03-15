@@ -85,16 +85,14 @@ body {
   height: 8px;
   border-radius: 50%;
   background: #4ade80;
-  display: none;
-  width: 8px;
-  height: 8px;
   margin-right: 10px;
+  flex-shrink: 0;
   animation: livepulse 2s infinite;
   display: none;
 }
 
 .live-status.active {
-  display: inline-block;
+  display: block;
 }
 
 @keyframes livepulse {
