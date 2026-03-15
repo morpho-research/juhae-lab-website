@@ -206,9 +206,9 @@ header h1 { font-size: 20px; font-weight: 700; letter-spacing: 6px; text-transfo
   <div class="progress-outer"><div class="progress-inner" id="task-progress"></div></div>
 </div>
 
-<div class="card">
+<div class="card" style="grid-column: 1 / -1;">
   <h2>Active Agents</h2>
-  <div id="agents">--</div>
+  <div id="agents" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:8px;">--</div>
 </div>
 
 <div class="card">
@@ -266,8 +266,12 @@ var d = {
   surveys: { experimental: { pre: 0, post: 0 }, control: { pre: 0, post: 0 } },
   status: 'done',
   active: [
-    { id: 'G1', name: 'Bulk generation - this laptop', terminal: 'main' },
-    { id: 'G2', name: 'Bulk generation - factory', terminal: 'factory' }
+    { id: 1, name: 'Student Account System', detail: 'database.py + server.py', status: 'working' },
+    { id: 2, name: 'Continue After Convergence', detail: 'pick.html', status: 'working' },
+    { id: 3, name: 'Results Copy Buttons', detail: 'results.html', status: 'working' },
+    { id: 4, name: 'Survey Review & Polish', detail: 'survey_pre/post.html', status: 'working' },
+    { id: 5, name: 'Paper 1 IJTDE Word', detail: 'Springer format', status: 'working' },
+    { id: 6, name: 'Paper 2 IJDesign Word', detail: 'IJDesign format', status: 'working' }
   ],
   phases: {
     'Image Generation': { done: 1, total: 3 },
@@ -302,7 +306,17 @@ document.getElementById('task-progress').style.width = (d.tasks.done / d.total_t
 
 var a = '';
 d.active.forEach(function(x) {
-  a += '<div class="agent"><span class="agent-id">[' + x.id + '] ' + x.name + '</span><div class="agent-detail">@ ' + x.terminal + '</div></div>';
+  var dotClass = x.status === 'working' ? '' : (x.status === 'error' ? ' error' : ' done');
+  var statusLabel = x.status === 'working' ? 'working' : (x.status === 'done' ? 'done' : x.status);
+  a += '<div class="agent">'
+     + '<div style="display:flex;align-items:center;justify-content:space-between;">'
+     + '<span class="agent-id">Agent ' + x.id + '</span>'
+     + '<span style="font-size:10px;color:#888;display:flex;align-items:center;gap:4px;">'
+     + '<span class="status-dot' + dotClass + '" style="position:static;width:5px;height:5px;margin:0;"></span>' + statusLabel + '</span>'
+     + '</div>'
+     + '<div style="margin-top:6px;font-weight:600;font-size:12px;color:#000;">' + x.name + '</div>'
+     + '<div class="agent-detail">' + x.detail + '</div>'
+     + '</div>';
 });
 document.getElementById('agents').innerHTML = a;
 

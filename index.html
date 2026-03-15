@@ -459,14 +459,39 @@ body {
   <div class="passcode-footer">2026</div>
 </div>
 
-<!-- Student ID Screen -->
+<!-- Student Login/Register Screen -->
 <div class="student-overlay" id="studentOverlay">
   <button class="student-close" onclick="closeStudent()">&times;</button>
-  <div class="student-label">Student ID</div>
-  <input class="student-input" id="studentId" type="text" placeholder="Student ID" maxlength="20" inputmode="numeric">
-  <div style="height:16px"></div>
-  <input class="student-input" id="studentName" type="text" placeholder="Name (English)">
-  <button class="student-go" onclick="goExperiment()">START</button>
+
+  <!-- Tab Toggle -->
+  <div style="display:flex;gap:0;margin-bottom:24px;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);">
+    <button id="tabRegister" style="flex:1;padding:10px;text-align:center;font-size:12px;font-weight:700;cursor:pointer;background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.85);border:none;font-family:'Effra',sans-serif;letter-spacing:2px;" onclick="showTab('register')">NEW</button>
+    <button id="tabLogin" style="flex:1;padding:10px;text-align:center;font-size:12px;font-weight:700;cursor:pointer;background:transparent;color:rgba(255,255,255,0.35);border:none;font-family:'Effra',sans-serif;letter-spacing:2px;" onclick="showTab('login')">LOGIN</button>
+  </div>
+
+  <!-- Register Form -->
+  <div id="registerForm">
+    <div class="student-label">New Student</div>
+    <input class="student-input" id="studentId" type="text" placeholder="Student ID" maxlength="20" inputmode="numeric">
+    <div style="height:12px"></div>
+    <input class="student-input" id="studentName" type="text" placeholder="Name (English)">
+    <div style="height:12px"></div>
+    <input class="student-input" id="studentPin" type="password" placeholder="4-digit PIN" maxlength="4" inputmode="numeric" pattern="[0-9]{4}">
+    <div style="height:4px"></div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.25);text-align:center;">Remember your PIN to come back later</div>
+    <button class="student-go" onclick="doRegister()">START</button>
+  </div>
+
+  <!-- Login Form -->
+  <div id="loginForm" style="display:none;">
+    <div class="student-label">Welcome Back</div>
+    <input class="student-input" id="loginId" type="text" placeholder="Student ID" maxlength="20" inputmode="numeric">
+    <div style="height:12px"></div>
+    <input class="student-input" id="loginPin" type="password" placeholder="4-digit PIN" maxlength="4" inputmode="numeric" pattern="[0-9]{4}">
+    <button class="student-go" onclick="doLogin()">LOGIN</button>
+  </div>
+
+  <div id="studentError" style="color:#ff453a;font-size:12px;margin-top:12px;text-align:center;display:none;"></div>
 </div>
 
 <script>
@@ -507,12 +532,64 @@ function closeStudent() {
   document.getElementById('studentOverlay').classList.remove('active');
 }
 
-function goExperiment() {
+var API = 'https://api.usepicky.live';
+
+function showTab(tab) {
+  document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
+  document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('tabRegister').style.background = tab === 'register' ? 'rgba(255,255,255,0.12)' : 'transparent';
+  document.getElementById('tabRegister').style.color = tab === 'register' ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.35)';
+  document.getElementById('tabLogin').style.background = tab === 'login' ? 'rgba(255,255,255,0.12)' : 'transparent';
+  document.getElementById('tabLogin').style.color = tab === 'login' ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.35)';
+  document.getElementById('studentError').style.display = 'none';
+}
+
+function showError(msg) {
+  var el = document.getElementById('studentError');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+async function doRegister() {
   var sid = document.getElementById('studentId').value.trim();
   var sname = document.getElementById('studentName').value.trim();
+  var pin = document.getElementById('studentPin').value.trim();
   if (!sid) { document.getElementById('studentId').style.border = '1px solid #ff453a'; return; }
   if (!sname) { document.getElementById('studentName').style.border = '1px solid #ff453a'; return; }
-  window.location.href = 'https://api.usepicky.live/survey/pre?group=experimental&pid=' + encodeURIComponent(sid) + '&name=' + encodeURIComponent(sname);
+  if (!pin || pin.length !== 4 || !/^\d{4}$/.test(pin)) { document.getElementById('studentPin').style.border = '1px solid #ff453a'; showError('PIN must be 4 digits'); return; }
+  try {
+    var res = await fetch(API + '/api/student/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ student_id: sid, name: sname, pin: pin })
+    });
+    var data = await res.json();
+    if (data.ok) {
+      window.location.href = API + '/survey/pre?group=experimental&pid=' + encodeURIComponent(sid) + '&name=' + encodeURIComponent(sname) + '&session_id=' + data.session_id;
+    } else {
+      showError(data.error || 'Registration failed');
+    }
+  } catch(e) { showError('Connection error'); }
+}
+
+async function doLogin() {
+  var sid = document.getElementById('loginId').value.trim();
+  var pin = document.getElementById('loginPin').value.trim();
+  if (!sid) { document.getElementById('loginId').style.border = '1px solid #ff453a'; return; }
+  if (!pin || pin.length !== 4) { document.getElementById('loginPin').style.border = '1px solid #ff453a'; showError('PIN must be 4 digits'); return; }
+  try {
+    var res = await fetch(API + '/api/student/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ student_id: sid, pin: pin })
+    });
+    var data = await res.json();
+    if (data.ok) {
+      window.location.href = API + '/?session_id=' + data.session_id + '&name=' + encodeURIComponent(data.name);
+    } else {
+      showError(data.error || 'Login failed');
+    }
+  } catch(e) { showError('Connection error'); }
 }
 
 // Numpad touch highlight
