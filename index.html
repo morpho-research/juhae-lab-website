@@ -239,15 +239,12 @@ body {
   height: 85px;
   border-radius: 50%;
   border: none;
-  background: rgba(255,255,255,0.12);
-  backdrop-filter: blur(50px) saturate(200%);
-  -webkit-backdrop-filter: blur(50px) saturate(200%);
+  background: transparent;
   color: #fff;
   font-family: -apple-system, 'SF Pro Display', 'Effra', sans-serif;
   font-size: 32px;
-  font-weight: 500;
-  border: 1px solid rgba(255,255,255,0.12);
-  border-top-color: rgba(255,255,255,0.25);
+  font-weight: 400;
+  border: 1.5px solid rgba(255,255,255,0.25);
   cursor: pointer;
   transition: background 0.08s;
   display: flex;
@@ -266,7 +263,8 @@ body {
 }
 
 .num-btn:active, .num-btn.pressed {
-  background: rgba(255,255,255,0.35);
+  background: rgba(255,255,255,0.25);
+  border-color: rgba(255,255,255,0.5);
 }
 
 .num-btn.empty {
