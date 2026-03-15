@@ -5,12 +5,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Juhae Lee</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+@font-face {
+  font-family: 'Effra';
+  src: url('fonts/Effra_He.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Effra';
+  src: url('fonts/Effra_Md.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-  font-family: 'Inter', -apple-system, sans-serif;
+  font-family: 'Effra', -apple-system, sans-serif;
   background: #000;
   color: #fff;
   height: 100vh;
@@ -22,16 +33,16 @@ body {
 }
 
 .name {
-  font-size: 28px;
-  font-weight: 300;
+  font-size: 32px;
+  font-weight: 900;
   letter-spacing: 8px;
   text-transform: uppercase;
   margin-bottom: 8px;
 }
 
 .lab {
-  font-size: 13px;
-  font-weight: 400;
+  font-size: 14px;
+  font-weight: 500;
   letter-spacing: 6px;
   text-transform: uppercase;
   color: #666;
@@ -43,7 +54,8 @@ body {
   border: 1px solid #333;
   background: transparent;
   color: #888;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Effra', sans-serif;
+  font-weight: 500;
   font-size: 12px;
   letter-spacing: 4px;
   text-transform: uppercase;
@@ -61,7 +73,7 @@ body {
   display: none;
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.9);
+  background: rgba(0,0,0,0.95);
   z-index: 100;
   align-items: center;
   justify-content: center;
@@ -80,8 +92,9 @@ body {
   border: none;
   border-bottom: 1px solid #333;
   color: #fff;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Effra', sans-serif;
   font-size: 16px;
+  font-weight: 500;
   padding: 12px 0;
   width: 240px;
   text-align: center;
@@ -117,6 +130,7 @@ body {
   cursor: pointer;
   background: none;
   border: none;
+  font-family: 'Effra', sans-serif;
 }
 
 .modal .close:hover {
@@ -127,7 +141,8 @@ footer {
   position: fixed;
   bottom: 30px;
   font-size: 11px;
-  color: #222;
+  font-weight: 500;
+  color: #1a1a1a;
   letter-spacing: 2px;
 }
 </style>
@@ -149,6 +164,8 @@ footer {
 <footer>2026</footer>
 
 <script>
+// SHA-256 hash of password "password" - change this to your own
+// To generate: echo -n "yourpassword" | sha256sum
 const HASH = '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8';
 
 function openModal() {
@@ -170,7 +187,7 @@ async function checkPwd() {
   const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
   if (hashHex === HASH) {
-    window.location.href = '/dashboard';
+    window.location.href = '/juhae-lab-website/dashboard/';
   } else {
     document.getElementById('error').textContent = 'INVALID';
     document.getElementById('pwd').value = '';
