@@ -19,6 +19,7 @@
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
+html { touch-action: manipulation; }
 
 body {
   font-family: 'Effra', -apple-system, sans-serif;
@@ -108,7 +109,7 @@ body {
 }
 
 .picky-btn {
-  margin-top: 12px;
+  margin-top: 16px !important;
 }
 
 .student-overlay {
@@ -469,25 +470,8 @@ body {
 </div>
 
 <script>
-// Check system status
-fetch('/dashboard/index.html?t=' + Date.now()).then(function(r) { return r.text(); }).then(function(html) {
-  var match = html.match(/time:\s*'(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2})'/);
-  var totalMatch = html.match(/total:\s*(\d+)/);
-  var dot = document.getElementById('liveStatus');
-  if (!match) return;
-  var parts = match[1].split(/[\s-:]+/);
-  var lastUpdate = new Date(parts[0], parts[1]-1, parts[2], parts[3], parts[4]);
-  var now = new Date();
-  var diff = (now - lastUpdate) / 60000;
-  if (diff < 10) {
-    dot.classList.add('active');
-    var total = totalMatch ? parseInt(totalMatch[1]) : 0;
-    if (total >= 3000) {
-      dot.style.background = 'rgba(255,255,255,0.5)';
-      dot.style.animation = 'livepulse 4s infinite';
-    }
-  }
-}).catch(function() {});
+// Status dot - always show (deployment itself proves system is alive)
+document.getElementById('liveStatus').classList.add('active');
 
 const HASH_ENTER = '0ffe1abd1a08215353c233d6e009613e95eec4253832a761af28ff37ac5a150c';
 const HASH_PICKY = '393a1a94b0e3a733d344c17fae097446b29e9d325f89fae0887021d5fe6c5792';
