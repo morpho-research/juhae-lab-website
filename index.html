@@ -381,6 +381,11 @@ fetch('/dashboard/index.html?t=' + Date.now()).then(function(r) { return r.text(
 const HASH = '0ffe1abd1a08215353c233d6e009613e95eec4253832a761af28ff37ac5a150c';
 let code = '';
 let startY = 0;
+let inputLocked = false;
+
+function haptic() {
+  if (navigator.vibrate) navigator.vibrate(10);
+}
 
 const lock = document.getElementById('lockScreen');
 
@@ -395,7 +400,10 @@ document.querySelectorAll('.num-btn').forEach(function(btn) {
   function unhighlight() { btn.classList.remove('pressed'); }
 
   btn.addEventListener('touchstart', function(e) {
+    if (inputLocked) return;
+    inputLocked = true;
     highlight();
+    haptic();
     var num = btn.getAttribute('data-num');
     var action = btn.getAttribute('data-action');
     if (num !== null) press(parseInt(num));
@@ -404,10 +412,12 @@ document.querySelectorAll('.num-btn').forEach(function(btn) {
   }, { passive: true });
 
   btn.addEventListener('touchend', function() {
-    setTimeout(unhighlight, 120);
+    setTimeout(function() { unhighlight(); inputLocked = false; }, 150);
   });
 
   btn.addEventListener('mousedown', function() {
+    if (inputLocked) return;
+    inputLocked = true;
     highlight();
     var num = btn.getAttribute('data-num');
     var action = btn.getAttribute('data-action');
@@ -417,7 +427,7 @@ document.querySelectorAll('.num-btn').forEach(function(btn) {
   });
 
   btn.addEventListener('mouseup', function() {
-    setTimeout(unhighlight, 120);
+    setTimeout(function() { unhighlight(); inputLocked = false; }, 150);
   });
 
   btn.addEventListener('mouseleave', unhighlight);
