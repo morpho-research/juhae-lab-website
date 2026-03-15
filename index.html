@@ -107,6 +107,100 @@ body {
   75% { opacity: 0.1; }
 }
 
+.picky-btn {
+  margin-top: 12px;
+}
+
+.student-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.97);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.student-overlay.active {
+  display: flex;
+}
+
+.student-label {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 20px;
+}
+
+.student-input {
+  background: rgba(255,255,255,0.08);
+  border: none;
+  border-radius: 12px;
+  color: #fff;
+  font-family: 'Effra', -apple-system, sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  padding: 16px 20px;
+  width: 100%;
+  max-width: 280px;
+  text-align: center;
+  letter-spacing: 4px;
+  outline: none;
+}
+
+.student-input:focus {
+  background: rgba(255,255,255,0.12);
+}
+
+.student-input::placeholder {
+  color: rgba(255,255,255,0.15);
+  letter-spacing: 2px;
+  font-size: 13px;
+}
+
+.student-go {
+  margin-top: 20px;
+  padding: 0;
+  width: auto;
+  height: 44px;
+  padding-left: 24px;
+  padding-right: 21px;
+  border-radius: 22px;
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(50px) saturate(200%);
+  -webkit-backdrop-filter: blur(50px) saturate(200%);
+  color: rgba(255,255,255,0.85);
+  font-family: 'Effra', -apple-system, sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-indent: 3px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: none;
+  transition: transform 0.1s;
+}
+
+.student-go:active {
+  transform: scale(0.95);
+}
+
+.student-close {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  color: rgba(255,255,255,0.3);
+  font-size: 28px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  width: 44px;
+  height: 44px;
+}
+
 .enter-btn {
   margin-top: 0;
   padding: 0;
@@ -334,6 +428,7 @@ body {
   <div class="name"><span class="live-status" id="liveStatus"></span>JU HAE LEE</div>
   <div class="lab">Morpho Lab</div>
   <button class="enter-btn" onclick="showPasscode()">ENTER</button>
+  <button class="enter-btn picky-btn" onclick="showPickyPasscode()">PICKY</button>
   <div class="footer">2026</div>
 </div>
 
@@ -363,6 +458,16 @@ body {
   <div class="passcode-footer">2026</div>
 </div>
 
+<!-- Student ID Screen -->
+<div class="student-overlay" id="studentOverlay">
+  <button class="student-close" onclick="closeStudent()">&times;</button>
+  <div class="student-label">Student ID</div>
+  <input class="student-input" id="studentId" type="text" placeholder="Student ID" maxlength="20" inputmode="numeric">
+  <div style="height:16px"></div>
+  <input class="student-input" id="studentName" type="text" placeholder="Name (English)">
+  <button class="student-go" onclick="goExperiment()">START</button>
+</div>
+
 <script>
 // Check system status
 fetch('/dashboard/index.html?t=' + Date.now()).then(function(r) { return r.text(); }).then(function(html) {
@@ -384,10 +489,12 @@ fetch('/dashboard/index.html?t=' + Date.now()).then(function(r) { return r.text(
   }
 }).catch(function() {});
 
-const HASH = '0ffe1abd1a08215353c233d6e009613e95eec4253832a761af28ff37ac5a150c';
+const HASH_ENTER = '0ffe1abd1a08215353c233d6e009613e95eec4253832a761af28ff37ac5a150c';
+const HASH_PICKY = '393a1a94b0e3a733d344c17fae097446b29e9d325f89fae0887021d5fe6c5792';
 let code = '';
 let startY = 0;
 let inputLocked = false;
+let pickyMode = false;
 
 function haptic() {
   if (navigator.vibrate) navigator.vibrate(10);
@@ -396,8 +503,32 @@ function haptic() {
 const lock = document.getElementById('lockScreen');
 
 function showPasscode() {
+  pickyMode = false;
   lock.classList.add('swiped');
   document.getElementById('passcodeScreen').classList.add('active');
+}
+
+function showPickyPasscode() {
+  pickyMode = true;
+  lock.classList.add('swiped');
+  document.getElementById('passcodeScreen').classList.add('active');
+}
+
+function showStudentId() {
+  document.getElementById('studentOverlay').classList.add('active');
+  document.getElementById('studentId').focus();
+}
+
+function closeStudent() {
+  document.getElementById('studentOverlay').classList.remove('active');
+}
+
+function goExperiment() {
+  var sid = document.getElementById('studentId').value.trim();
+  var sname = document.getElementById('studentName').value.trim();
+  if (!sid) { document.getElementById('studentId').style.border = '1px solid #ff453a'; return; }
+  if (!sname) { document.getElementById('studentName').style.border = '1px solid #ff453a'; return; }
+  window.location.href = 'https://api.usepicky.live/?id=' + encodeURIComponent(sid) + '&name=' + encodeURIComponent(sname);
 }
 
 // Numpad touch highlight
@@ -484,8 +615,11 @@ async function checkCode() {
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
-  if (hashHex === HASH) {
+  if (!pickyMode && hashHex === HASH_ENTER) {
     window.location.href = '/dashboard/';
+  } else if (pickyMode && hashHex === HASH_PICKY) {
+    document.getElementById('passcodeScreen').classList.remove('active');
+    showStudentId();
   } else {
     const dots = document.querySelectorAll('.dot');
     dots.forEach(d => d.className = 'dot error');
