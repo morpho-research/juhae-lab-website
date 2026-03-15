@@ -355,15 +355,21 @@ body {
 </div>
 
 <script>
-// Check if system is alive (factory_stats.json updated within 10 min)
+// Check system status from dashboard data
 fetch('/dashboard/').then(r => r.text()).then(html => {
   var match = html.match(/time: '(\d{4}-\d{2}-\d{2} \d{2}:\d{2})'/);
+  var totalMatch = html.match(/total: (\d+)/);
   if (match) {
     var lastUpdate = new Date(match[1].replace(' ', 'T') + ':00+09:00');
     var now = new Date();
     var diff = (now - lastUpdate) / 1000 / 60;
+    var dot = document.getElementById('liveStatus');
     if (diff < 10) {
-      document.getElementById('liveStatus').classList.add('active');
+      dot.classList.add('active');
+      var total = totalMatch ? parseInt(totalMatch[1]) : 0;
+      if (total >= 3000) {
+        dot.style.background = '#ff453a';
+      }
     }
   }
 }).catch(function() {});
