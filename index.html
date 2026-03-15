@@ -246,7 +246,10 @@ body {
   font-family: -apple-system, 'SF Pro Display', 'Effra', sans-serif;
   font-size: 32px;
   font-weight: 400;
-  border: 1.5px solid rgba(255,255,255,0.2);
+  border: 1.5px solid transparent;
+  background-image: linear-gradient(rgba(255,255,255,0.06), rgba(255,255,255,0.06)), linear-gradient(180deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.2) 100%);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
   cursor: pointer;
   transition: background 0.08s;
   display: flex;
@@ -265,8 +268,9 @@ body {
 }
 
 .num-btn:active, .num-btn.pressed {
-  background: rgba(255,255,255,0.25);
-  border-color: rgba(255,255,255,0.5);
+  background-image: linear-gradient(rgba(255,255,255,0.25), rgba(255,255,255,0.25)), linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.3) 100%);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
 }
 
 .num-btn.empty {
