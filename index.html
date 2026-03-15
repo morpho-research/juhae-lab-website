@@ -89,15 +89,41 @@ body {
   text-indent: 3px;
   text-transform: uppercase;
   cursor: pointer;
-  transition: transform 0.1s ease, background 0.1s ease;
+  transition: transform 0.1s ease;
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-top-color: rgba(255,255,255,0.2);
+}
+
+.enter-btn::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -50%; right: -50%;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 100%);
+  border-radius: 22px 22px 0 0;
+  pointer-events: none;
+}
+
+.enter-btn .ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.4);
+  transform: scale(0);
+  animation: ripple 0.4s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes ripple {
+  to { transform: scale(3); opacity: 0; }
 }
 
 .enter-btn:active {
   transform: scale(0.95);
-  background: rgba(255,255,255,0.25);
 }
 
 /* Passcode screen */
@@ -254,6 +280,23 @@ function showPasscode() {
   lock.classList.add('swiped');
   document.getElementById('passcodeScreen').classList.add('active');
 }
+
+// Ripple effect on button
+document.querySelector('.enter-btn').addEventListener('click', function(e) {
+  const btn = this;
+  const rect = btn.getBoundingClientRect();
+  const x = (e.clientX || e.touches?.[0]?.clientX || rect.left + rect.width/2) - rect.left;
+  const y = (e.clientY || e.touches?.[0]?.clientY || rect.top + rect.height/2) - rect.top;
+  const ripple = document.createElement('span');
+  ripple.className = 'ripple';
+  ripple.style.left = x + 'px';
+  ripple.style.top = y + 'px';
+  ripple.style.width = ripple.style.height = '40px';
+  ripple.style.marginLeft = '-20px';
+  ripple.style.marginTop = '-20px';
+  btn.appendChild(ripple);
+  setTimeout(function() { ripple.remove(); }, 400);
+});
 
 // Numpad
 function press(n) {
