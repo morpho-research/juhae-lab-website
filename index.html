@@ -81,14 +81,16 @@ body {
   height: 8px;
   border-radius: 50%;
   background: #4ade80;
-  position: absolute;
-  top: 60px;
+  display: none;
+  width: 8px;
+  height: 8px;
+  margin-right: 10px;
   animation: livepulse 2s infinite;
   display: none;
 }
 
 .live-status.active {
-  display: block;
+  display: inline-block;
 }
 
 @keyframes livepulse {
@@ -320,8 +322,7 @@ body {
 
 <!-- Lock Screen -->
 <div class="lock-screen" id="lockScreen">
-  <div class="live-status" id="liveStatus"></div>
-  <div class="name">JU HAE LEE</div>
+  <div class="name"><span class="live-status" id="liveStatus"></span>JU HAE LEE</div>
   <div class="lab">Morpho Lab</div>
   <button class="enter-btn" onclick="showPasscode()">ENTER</button>
   <div class="footer">2026</div>
