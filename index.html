@@ -98,6 +98,13 @@ body {
   50% { opacity: 0.3; }
 }
 
+@keyframes urgentpulse {
+  0%, 100% { opacity: 1; }
+  25% { opacity: 0.1; }
+  50% { opacity: 1; }
+  75% { opacity: 0.1; }
+}
+
 .enter-btn {
   margin-top: 32px;
   padding: 0;
@@ -367,8 +374,15 @@ fetch('/dashboard/').then(r => r.text()).then(html => {
     if (diff < 10) {
       dot.classList.add('active');
       var total = totalMatch ? parseInt(totalMatch[1]) : 0;
-      if (total >= 3000) {
+      // Check for error status
+      var errorMatch = html.match(/status: '(\w+)'/);
+      var status = errorMatch ? errorMatch[1] : 'working';
+      if (status === 'error') {
         dot.style.background = '#ff453a';
+        dot.style.animation = 'urgentpulse 0.6s infinite';
+      } else if (total >= 3000) {
+        dot.style.background = 'rgba(255,255,255,0.5)';
+        dot.style.animation = 'livepulse 4s infinite';
       }
     }
   }
