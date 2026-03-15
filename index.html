@@ -76,6 +76,25 @@ body {
   text-align: center;
 }
 
+.live-status {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4ade80;
+  margin-bottom: 24px;
+  animation: livepulse 2s infinite;
+  display: none;
+}
+
+.live-status.active {
+  display: block;
+}
+
+@keyframes livepulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
 .enter-btn {
   margin-top: 10px;
   padding: 0;
@@ -302,6 +321,7 @@ body {
 <div class="lock-screen" id="lockScreen">
   <div class="name">JU HAE LEE</div>
   <div class="lab">Morpho Lab</div>
+  <div class="live-status" id="liveStatus"></div>
   <button class="enter-btn" onclick="showPasscode()">ENTER</button>
   <div class="footer">2026</div>
 </div>
@@ -333,6 +353,19 @@ body {
 </div>
 
 <script>
+// Check if system is alive (factory_stats.json updated within 10 min)
+fetch('/dashboard/').then(r => r.text()).then(html => {
+  var match = html.match(/time: '(\d{4}-\d{2}-\d{2} \d{2}:\d{2})'/);
+  if (match) {
+    var lastUpdate = new Date(match[1].replace(' ', 'T') + ':00+09:00');
+    var now = new Date();
+    var diff = (now - lastUpdate) / 1000 / 60;
+    if (diff < 10) {
+      document.getElementById('liveStatus').classList.add('active');
+    }
+  }
+}).catch(function() {});
+
 const HASH = '0ffe1abd1a08215353c233d6e009613e95eec4253832a761af28ff37ac5a150c';
 let code = '';
 let startY = 0;
