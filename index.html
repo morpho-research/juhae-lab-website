@@ -305,27 +305,19 @@ body {
   color: rgba(255,255,255,0.5);
   letter-spacing: 2px;
 }
-/* Desktop - match phone feel */
-@media (min-width: 768px) {
-  .lock-screen, .passcode-screen {
-    max-width: 420px;
-    margin: 0 auto;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-  .lock-screen.swiped {
-    transform: translateX(-50%) translateY(-100%);
-  }
+/* All screens: lock to phone proportions */
+.lock-screen, .passcode-screen {
+  max-width: 420px;
+  margin: 0 auto;
+  left: 0; right: 0;
 }
 
 /* Small phones */
 @media (max-width: 380px) {
   .name { font-size: 22px; letter-spacing: 7px; text-indent: 7px; }
-  .lab { font-size: 11px; letter-spacing: 4px; text-indent: 4px; margin-bottom: 40px; }
-  .enter-btn { height: 40px; font-size: 11px; }
+  .lab { font-size: 11px; letter-spacing: 4px; text-indent: 4px; }
   .numpad { grid-template-columns: repeat(3, 72px); gap: 10px; }
   .num-btn { width: 72px; height: 72px; font-size: 28px; }
-  .num-btn .sub { font-size: 8px; }
 }
 </style>
 </head>
