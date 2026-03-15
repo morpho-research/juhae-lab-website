@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Juhae Lee</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: #000;
+  color: #fff;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  -webkit-font-smoothing: antialiased;
+}
+
+.name {
+  font-size: 28px;
+  font-weight: 300;
+  letter-spacing: 8px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.lab {
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  color: #666;
+  margin-bottom: 60px;
+}
+
+.dash-btn {
+  padding: 12px 40px;
+  border: 1px solid #333;
+  background: transparent;
+  color: #888;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dash-btn:hover {
+  border-color: #fff;
+  color: #fff;
+}
+
+/* Password modal */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.9);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal {
+  text-align: center;
+}
+
+.modal input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #333;
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  padding: 12px 0;
+  width: 240px;
+  text-align: center;
+  letter-spacing: 4px;
+  outline: none;
+  -webkit-text-security: disc;
+}
+
+.modal input:focus {
+  border-bottom-color: #fff;
+}
+
+.modal input::placeholder {
+  color: #333;
+  letter-spacing: 2px;
+  font-size: 12px;
+}
+
+.modal .error {
+  color: #ff3333;
+  font-size: 11px;
+  margin-top: 12px;
+  height: 16px;
+  letter-spacing: 2px;
+}
+
+.modal .close {
+  position: absolute;
+  top: 40px;
+  right: 40px;
+  color: #333;
+  font-size: 24px;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+.modal .close:hover {
+  color: #fff;
+}
+
+footer {
+  position: fixed;
+  bottom: 30px;
+  font-size: 11px;
+  color: #222;
+  letter-spacing: 2px;
+}
+</style>
+</head>
+<body>
+
+<div class="name">Juhae Lee</div>
+<div class="lab">Morpho Lab</div>
+<button class="dash-btn" onclick="openModal()">Dashboard</button>
+
+<div class="modal-overlay" id="modal">
+  <button class="close" onclick="closeModal()">&times;</button>
+  <div class="modal">
+    <input type="password" id="pwd" placeholder="password" onkeydown="if(event.key==='Enter')checkPwd()">
+    <div class="error" id="error"></div>
+  </div>
+</div>
+
+<footer>2026</footer>
+
+<script>
+const HASH = '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8';
+
+function openModal() {
+  document.getElementById('modal').classList.add('active');
+  document.getElementById('pwd').focus();
+  document.getElementById('error').textContent = '';
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('active');
+  document.getElementById('pwd').value = '';
+}
+
+async function checkPwd() {
+  const pwd = document.getElementById('pwd').value;
+  const encoded = new TextEncoder().encode(pwd);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', encoded);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+  if (hashHex === HASH) {
+    window.location.href = '/dashboard';
+  } else {
+    document.getElementById('error').textContent = 'INVALID';
+    document.getElementById('pwd').value = '';
+  }
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeModal();
+});
+</script>
+
+</body>
+</html>

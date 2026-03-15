@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; background: #000; color: #fff; padding: 20px; }
+
+header {
+  text-align: center;
+  padding: 20px 0 30px;
+  border-bottom: 1px solid #111;
+  margin-bottom: 30px;
+}
+header h1 { font-size: 14px; font-weight: 300; letter-spacing: 6px; text-transform: uppercase; color: #666; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.card {
+  background: #0a0a0a;
+  border: 1px solid #151515;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.card h2 {
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #444;
+  margin-bottom: 16px;
+}
+
+.big { font-size: 42px; font-weight: 700; color: #fff; line-height: 1; }
+.big span { font-size: 14px; color: #333; font-weight: 300; }
+
+.progress-outer {
+  background: #111;
+  border-radius: 4px;
+  height: 4px;
+  margin: 12px 0;
+  overflow: hidden;
+}
+.progress-inner {
+  background: #fff;
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #0f0f0f;
+  font-size: 13px;
+}
+.row:last-child { border: none; }
+.row-label { color: #444; }
+.row-value { color: #aaa; font-weight: 600; }
+.row-value.highlight { color: #fff; }
+
+.tag {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 3px;
+  font-size: 11px;
+  letter-spacing: 1px;
+  margin: 2px;
+}
+.tag-done { background: #0a1a0a; color: #4a4; border: 1px solid #1a2a1a; }
+.tag-active { background: #0a0a1a; color: #88f; border: 1px solid #1a1a2a; }
+.tag-ready { background: #1a1a0a; color: #aa8; border: 1px solid #2a2a1a; }
+.tag-blocked { background: #1a0a0a; color: #a44; border: 1px solid #2a1a1a; }
+
+.phase {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 0;
+  font-size: 12px;
+}
+.phase-name { flex: 1; color: #555; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.phase-bar { flex: 0 0 80px; background: #111; border-radius: 2px; height: 3px; overflow: hidden; }
+.phase-fill { background: #fff; height: 100%; }
+.phase-count { color: #333; font-size: 11px; min-width: 30px; text-align: right; }
+
+.agent {
+  padding: 10px;
+  background: #050505;
+  border: 1px solid #111;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+.agent-id { color: #fff; font-weight: 600; }
+.agent-detail { color: #333; margin-top: 4px; }
+
+.next-item { padding: 6px 0; font-size: 12px; color: #444; border-bottom: 1px solid #080808; }
+
+.meta { color: #222; font-size: 11px; text-align: center; margin-top: 30px; letter-spacing: 2px; }
+
+.back {
+  display: inline-block;
+  color: #333;
+  text-decoration: none;
+  font-size: 11px;
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+}
+.back:hover { color: #fff; }
+
+.status-dot {
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #4a4;
+  margin-right: 6px;
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+</style>
+</head>
+<body>
+
+<a href="/" class="back">< back</a>
+
+<header>
+  <h1><span class="status-dot"></span>Research Dashboard</h1>
+</header>
+
+<div class="grid">
+
+<div class="card">
+  <h2>Image Generation</h2>
+  <div class="big" id="total-img">--<span> / 3000</span></div>
+  <div class="progress-outer"><div class="progress-inner" id="img-progress"></div></div>
+  <div class="row"><span class="row-label">This laptop</span><span class="row-value" id="bulk-stat">--</span></div>
+  <div class="row"><span class="row-label">Factory</span><span class="row-value" id="fctry-stat">--</span></div>
+  <div class="row"><span class="row-label">ETA</span><span class="row-value highlight" id="eta">--</span></div>
+  <div class="row"><span class="row-label">Latest</span><span class="row-value" id="latest">--</span></div>
+</div>
+
+<div class="card">
+  <h2>Tasks</h2>
+  <div style="margin-bottom:12px">
+    <span class="tag tag-done" id="tag-done">--</span>
+    <span class="tag tag-active" id="tag-active">--</span>
+    <span class="tag tag-ready" id="tag-ready">--</span>
+    <span class="tag tag-blocked" id="tag-blocked">--</span>
+  </div>
+  <div class="progress-outer"><div class="progress-inner" id="task-progress"></div></div>
+</div>
+
+<div class="card">
+  <h2>Active Agents</h2>
+  <div id="agents">--</div>
+</div>
+
+<div class="card">
+  <h2>Phases</h2>
+  <div id="phases">--</div>
+</div>
+
+<div class="card">
+  <h2>Next Up</h2>
+  <div id="next-up">--</div>
+</div>
+
+<div class="card">
+  <h2>Papers</h2>
+  <div class="row"><span class="row-label">Paper 1</span><span class="row-value">Draft</span></div>
+  <div class="row"><span class="row-label">Paper 2</span><span class="row-value">Skeleton</span></div>
+  <div class="row"><span class="row-label">Paper 3</span><span class="row-value">Skeleton</span></div>
+</div>
+
+</div>
+
+<div class="meta" id="time">--</div>
+
+<script>
+const API = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://127.0.0.1:5050/api/status'
+  : '/api/status';
+
+function update() {
+  fetch(API).then(r => r.json()).then(d => {
+    document.getElementById('time').textContent = d.time + ' | auto-refresh 10s';
+    document.getElementById('total-img').innerHTML = d.images.total + '<span> / ' + d.images.target + '</span>';
+    document.getElementById('img-progress').style.width = d.images.pct + '%';
+    document.getElementById('bulk-stat').textContent = d.images.bulk + ' | ' + d.images.bulk_speed + '/hr';
+    document.getElementById('fctry-stat').textContent = d.images.fctry + ' | ' + d.images.fctry_speed + '/hr';
+    document.getElementById('eta').textContent = d.images.eta;
+    document.getElementById('latest').textContent = d.images.latest_cat + ' | ' + d.images.latest_style;
+
+    document.getElementById('tag-done').textContent = 'done ' + d.tasks.done;
+    document.getElementById('tag-active').textContent = 'active ' + d.tasks.in_progress;
+    document.getElementById('tag-ready').textContent = 'ready ' + d.tasks.ready;
+    document.getElementById('tag-blocked').textContent = 'blocked ' + d.tasks.blocked;
+    document.getElementById('task-progress').style.width = (d.tasks.done / d.total_tasks * 100) + '%';
+
+    var a = '';
+    d.active.forEach(function(x) {
+      a += '<div class="agent"><span class="agent-id">[' + x.id + '] ' + x.name + '</span><div class="agent-detail">@ ' + (x.terminal || 'auto') + '</div></div>';
+    });
+    document.getElementById('agents').innerHTML = a || '<span style="color:#333">idle</span>';
+
+    var p = '';
+    for (var k in d.phases) {
+      var v = d.phases[k];
+      var pct = v.total > 0 ? (v.done / v.total * 100) : 0;
+      var name = k.length > 28 ? k.substring(0, 28) + '..' : k;
+      p += '<div class="phase"><span class="phase-name">' + name + '</span><div class="phase-bar"><div class="phase-fill" style="width:' + pct + '%"></div></div><span class="phase-count">' + v.done + '/' + v.total + '</span></div>';
+    }
+    document.getElementById('phases').innerHTML = p;
+
+    var n = '';
+    d.next_up.forEach(function(x) {
+      n += '<div class="next-item">[' + x.id + '] ' + x.name + '</div>';
+    });
+    document.getElementById('next-up').innerHTML = n || '<span style="color:#2a2a2a">all clear</span>';
+  }).catch(function() {
+    document.getElementById('time').textContent = 'connection lost - retrying...';
+  });
+}
+update();
+setInterval(update, 10000);
+</script>
+</body>
+</html>
