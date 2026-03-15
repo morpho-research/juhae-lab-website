@@ -258,16 +258,17 @@ body {
   color: rgba(255,255,255,0.5);
   letter-spacing: 2px;
 }
-/* Desktop */
+/* Desktop - match phone feel */
 @media (min-width: 768px) {
-  .name { font-size: 42px; letter-spacing: 14px; text-indent: 14px; }
-  .lab { font-size: 15px; letter-spacing: 7px; text-indent: 7px; }
-  .enter-btn { height: 48px; font-size: 13px; padding-left: 24px; padding-right: 21px; }
-  .numpad { grid-template-columns: repeat(3, 90px); gap: 18px; }
-  .num-btn { width: 90px; height: 90px; font-size: 34px; }
-  .passcode-label { font-size: 18px; }
-  .dots { gap: 22px; }
-  .dot { width: 15px; height: 15px; }
+  .lock-screen, .passcode-screen {
+    max-width: 420px;
+    margin: 0 auto;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .lock-screen.swiped {
+    transform: translateX(-50%) translateY(-100%);
+  }
 }
 
 /* Small phones */
