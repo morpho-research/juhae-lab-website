@@ -212,52 +212,66 @@ header h1 { font-size: 14px; font-weight: 700; letter-spacing: 6px; text-transfo
 <div class="meta" id="time">--</div>
 
 <script>
-const API = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-  ? 'http://127.0.0.1:5050/api/status'
-  : '/api/status';
+// Static data - last updated 2026-03-15 15:43
+var d = {
+  time: '2026-03-15 15:43',
+  images: { total: 720, target: 3000, pct: 24, bulk: 720, bulk_speed: 196, fctry: 0, fctry_speed: 240, eta: '~6h', latest_cat: 'wall mirror', latest_style: 'gothic dark romantic' },
+  tasks: { done: 30, in_progress: 2, ready: 6, blocked: 2 },
+  total_tasks: 40,
+  active: [
+    { id: 'G1', name: 'Bulk generation - this laptop', terminal: 'main' },
+    { id: 'G2', name: 'Bulk generation - factory', terminal: 'factory' }
+  ],
+  phases: {
+    'Image Generation': { done: 1, total: 3 },
+    'System Preparation': { done: 6, total: 6 },
+    'Paper 1': { done: 11, total: 12 },
+    'Analysis Scripts': { done: 3, total: 3 },
+    'Experiment': { done: 0, total: 5 },
+    'Paper 2 - Taste': { done: 3, total: 3 },
+    'Paper 3 - LoRA': { done: 3, total: 3 },
+    'Submission': { done: 3, total: 5 }
+  },
+  next_up: [
+    { id: 'E1', name: 'Pilot test (Monday)' },
+    { id: 'E2', name: 'Fix pilot issues' },
+    { id: 'E3', name: 'Main experiment (65 students)' }
+  ]
+};
 
-function update() {
-  fetch(API).then(r => r.json()).then(d => {
-    document.getElementById('time').textContent = d.time + ' | auto-refresh 10s';
-    document.getElementById('total-img').innerHTML = d.images.total + '<span> / ' + d.images.target + '</span>';
-    document.getElementById('img-progress').style.width = d.images.pct + '%';
-    document.getElementById('bulk-stat').textContent = d.images.bulk + ' | ' + d.images.bulk_speed + '/hr';
-    document.getElementById('fctry-stat').textContent = d.images.fctry + ' | ' + d.images.fctry_speed + '/hr';
-    document.getElementById('eta').textContent = d.images.eta;
-    document.getElementById('latest').textContent = d.images.latest_cat + ' | ' + d.images.latest_style;
+document.getElementById('time').textContent = d.time + ' | static snapshot';
+document.getElementById('total-img').innerHTML = d.images.total + '<span> / ' + d.images.target + '</span>';
+document.getElementById('img-progress').style.width = d.images.pct + '%';
+document.getElementById('bulk-stat').textContent = d.images.bulk + ' imgs | ' + d.images.bulk_speed + '/hr';
+document.getElementById('fctry-stat').textContent = d.images.fctry + ' imgs | ' + d.images.fctry_speed + '/hr';
+document.getElementById('eta').textContent = d.images.eta;
+document.getElementById('latest').textContent = d.images.latest_cat + ' | ' + d.images.latest_style;
 
-    document.getElementById('tag-done').textContent = 'done ' + d.tasks.done;
-    document.getElementById('tag-active').textContent = 'active ' + d.tasks.in_progress;
-    document.getElementById('tag-ready').textContent = 'ready ' + d.tasks.ready;
-    document.getElementById('tag-blocked').textContent = 'blocked ' + d.tasks.blocked;
-    document.getElementById('task-progress').style.width = (d.tasks.done / d.total_tasks * 100) + '%';
+document.getElementById('tag-done').textContent = 'done ' + d.tasks.done;
+document.getElementById('tag-active').textContent = 'active ' + d.tasks.in_progress;
+document.getElementById('tag-ready').textContent = 'ready ' + d.tasks.ready;
+document.getElementById('tag-blocked').textContent = 'blocked ' + d.tasks.blocked;
+document.getElementById('task-progress').style.width = (d.tasks.done / d.total_tasks * 100) + '%';
 
-    var a = '';
-    d.active.forEach(function(x) {
-      a += '<div class="agent"><span class="agent-id">[' + x.id + '] ' + x.name + '</span><div class="agent-detail">@ ' + (x.terminal || 'auto') + '</div></div>';
-    });
-    document.getElementById('agents').innerHTML = a || '<span style="color:#333">idle</span>';
+var a = '';
+d.active.forEach(function(x) {
+  a += '<div class="agent"><span class="agent-id">[' + x.id + '] ' + x.name + '</span><div class="agent-detail">@ ' + x.terminal + '</div></div>';
+});
+document.getElementById('agents').innerHTML = a;
 
-    var p = '';
-    for (var k in d.phases) {
-      var v = d.phases[k];
-      var pct = v.total > 0 ? (v.done / v.total * 100) : 0;
-      var name = k.length > 28 ? k.substring(0, 28) + '..' : k;
-      p += '<div class="phase"><span class="phase-name">' + name + '</span><div class="phase-bar"><div class="phase-fill" style="width:' + pct + '%"></div></div><span class="phase-count">' + v.done + '/' + v.total + '</span></div>';
-    }
-    document.getElementById('phases').innerHTML = p;
-
-    var n = '';
-    d.next_up.forEach(function(x) {
-      n += '<div class="next-item">[' + x.id + '] ' + x.name + '</div>';
-    });
-    document.getElementById('next-up').innerHTML = n || '<span style="color:#2a2a2a">all clear</span>';
-  }).catch(function() {
-    document.getElementById('time').textContent = 'connection lost - retrying...';
-  });
+var p = '';
+for (var k in d.phases) {
+  var v = d.phases[k];
+  var pct = v.total > 0 ? (v.done / v.total * 100) : 0;
+  p += '<div class="phase"><span class="phase-name">' + k + '</span><div class="phase-bar"><div class="phase-fill" style="width:' + pct + '%"></div></div><span class="phase-count">' + v.done + '/' + v.total + '</span></div>';
 }
-update();
-setInterval(update, 10000);
+document.getElementById('phases').innerHTML = p;
+
+var n = '';
+d.next_up.forEach(function(x) {
+  n += '<div class="next-item">[' + x.id + '] ' + x.name + '</div>';
+});
+document.getElementById('next-up').innerHTML = n;
 </script>
 </body>
 </html>
