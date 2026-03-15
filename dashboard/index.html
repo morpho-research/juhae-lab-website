@@ -222,6 +222,16 @@ header h1 { font-size: 20px; font-weight: 700; letter-spacing: 6px; text-transfo
 </div>
 
 <div class="card">
+  <h2>Students</h2>
+  <div id="students">--</div>
+</div>
+
+<div class="card">
+  <h2>Surveys</h2>
+  <div id="surveys">--</div>
+</div>
+
+<div class="card">
   <h2>Papers</h2>
   <div class="row"><span class="row-label">Paper 1 - Prompt Literacy</span><span class="row-value">Draft (~7200w)</span></div>
   <div class="row"><span class="row-label">Paper 2 - Taste Structure</span><span class="row-value">Skeleton</span></div>
@@ -320,6 +330,30 @@ d.next_up.forEach(function(x) {
   n += '<div class="next-item">[' + x.id + '] ' + x.name + '</div>';
 });
 document.getElementById('next-up').innerHTML = n;
+
+// Students
+if (d.sessions && d.sessions.length > 0) {
+  var st = '';
+  d.sessions.forEach(function(s) {
+    var converged = s.total >= 40 && s.liked > 0 && (s.liked / s.total) < 0.35;
+    var badge = converged ? '<span style="color:#4ade80;font-size:11px"> converged</span>' : '';
+    var grp = s.participant_group === 'control' ? '<span style="color:#888;font-size:10px"> C</span>' : '<span style="color:#88f;font-size:10px"> E</span>';
+    st += '<div class="row"><span class="row-label">' + s.name + grp + '</span><span class="row-value">' + s.liked + ' / ' + s.passed + badge + '</span></div>';
+  });
+  document.getElementById('students').innerHTML = st;
+} else {
+  document.getElementById('students').innerHTML = '<div class="row"><span class="row-label">No sessions yet</span><span class="row-value">--</span></div>';
+}
+
+// Surveys
+if (d.surveys) {
+  var sv = '';
+  sv += '<div class="row"><span class="row-label">Experimental - Pre</span><span class="row-value">' + d.surveys.experimental.pre + '</span></div>';
+  sv += '<div class="row"><span class="row-label">Experimental - Post</span><span class="row-value">' + d.surveys.experimental.post + '</span></div>';
+  sv += '<div class="row"><span class="row-label">Control - Pre</span><span class="row-value">' + d.surveys.control.pre + '</span></div>';
+  sv += '<div class="row"><span class="row-label">Control - Post</span><span class="row-value">' + d.surveys.control.post + '</span></div>';
+  document.getElementById('surveys').innerHTML = sv;
+}
 </script>
 </body>
 </html>

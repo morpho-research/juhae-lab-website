@@ -512,7 +512,7 @@ function goExperiment() {
   var sname = document.getElementById('studentName').value.trim();
   if (!sid) { document.getElementById('studentId').style.border = '1px solid #ff453a'; return; }
   if (!sname) { document.getElementById('studentName').style.border = '1px solid #ff453a'; return; }
-  window.location.href = 'https://api.usepicky.live/?id=' + encodeURIComponent(sid) + '&name=' + encodeURIComponent(sname);
+  window.location.href = 'https://api.usepicky.live/survey/pre?group=experimental&pid=' + encodeURIComponent(sid) + '&name=' + encodeURIComponent(sname);
 }
 
 // Numpad touch highlight
