@@ -52,6 +52,7 @@ body {
 .dash-btn {
   padding: 12px 40px;
   border: 1px solid #333;
+  border-radius: 30px;
   background: transparent;
   color: #888;
   font-family: 'Effra', sans-serif;
@@ -187,7 +188,7 @@ async function checkPwd() {
   const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
   if (hashHex === HASH) {
-    window.location.href = '/juhae-lab-website/dashboard/';
+    window.location.href = '/dashboard/';
   } else {
     document.getElementById('error').textContent = 'INVALID';
     document.getElementById('pwd').value = '';
