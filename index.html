@@ -202,11 +202,15 @@ body {
   height: 85px;
   border-radius: 50%;
   border: none;
-  background: rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(50px) saturate(200%);
+  -webkit-backdrop-filter: blur(50px) saturate(200%);
   color: #fff;
   font-family: -apple-system, 'SF Pro Display', 'Effra', sans-serif;
   font-size: 32px;
   font-weight: 300;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-top-color: rgba(255,255,255,0.15);
   cursor: pointer;
   transition: background 0.08s;
   display: flex;
