@@ -362,28 +362,22 @@ body {
 </div>
 
 <script>
-// Check system status from dashboard data
-fetch('/dashboard/').then(r => r.text()).then(html => {
-  var match = html.match(/time: '(\d{4}-\d{2}-\d{2} \d{2}:\d{2})'/);
-  var totalMatch = html.match(/total: (\d+)/);
-  if (match) {
-    var lastUpdate = new Date(match[1].replace(' ', 'T') + ':00+09:00');
-    var now = new Date();
-    var diff = (now - lastUpdate) / 1000 / 60;
-    var dot = document.getElementById('liveStatus');
-    if (diff < 10) {
-      dot.classList.add('active');
-      var total = totalMatch ? parseInt(totalMatch[1]) : 0;
-      // Check for error status
-      var errorMatch = html.match(/status: '(\w+)'/);
-      var status = errorMatch ? errorMatch[1] : 'working';
-      if (status === 'error') {
-        dot.style.background = '#ff453a';
-        dot.style.animation = 'urgentpulse 0.6s infinite';
-      } else if (total >= 3000) {
-        dot.style.background = 'rgba(255,255,255,0.5)';
-        dot.style.animation = 'livepulse 4s infinite';
-      }
+// Check system status
+fetch('/dashboard/index.html?t=' + Date.now()).then(function(r) { return r.text(); }).then(function(html) {
+  var match = html.match(/time:\s*'(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2})'/);
+  var totalMatch = html.match(/total:\s*(\d+)/);
+  var dot = document.getElementById('liveStatus');
+  if (!match) return;
+  var parts = match[1].split(/[\s-:]+/);
+  var lastUpdate = new Date(parts[0], parts[1]-1, parts[2], parts[3], parts[4]);
+  var now = new Date();
+  var diff = (now - lastUpdate) / 60000;
+  if (diff < 10) {
+    dot.classList.add('active');
+    var total = totalMatch ? parseInt(totalMatch[1]) : 0;
+    if (total >= 3000) {
+      dot.style.background = 'rgba(255,255,255,0.5)';
+      dot.style.animation = 'livepulse 4s infinite';
     }
   }
 }).catch(function() {});
