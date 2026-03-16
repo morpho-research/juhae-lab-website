@@ -134,6 +134,8 @@ body {
   text-transform: uppercase;
   color: rgba(255,255,255,0.5);
   margin-bottom: 20px;
+  text-align: center;
+  width: 100%;
 }
 
 .student-input {
@@ -165,7 +167,8 @@ body {
 .student-go {
   margin-top: 20px;
   padding: 0;
-  width: auto;
+  width: 100%;
+  max-width: 280px;
   height: 44px;
   padding-left: 24px;
   padding-right: 21px;
@@ -470,7 +473,7 @@ body {
   </div>
 
   <!-- Register Form -->
-  <div id="registerForm">
+  <div id="registerForm" style="display:flex;flex-direction:column;align-items:center;width:100%;">
     <div class="student-label">New Student</div>
     <input class="student-input" id="studentId" type="text" placeholder="Student ID" maxlength="20" inputmode="numeric">
     <div style="height:12px"></div>
@@ -483,7 +486,7 @@ body {
   </div>
 
   <!-- Login Form -->
-  <div id="loginForm" style="display:none;">
+  <div id="loginForm" style="display:none;flex-direction:column;align-items:center;width:100%;">
     <div class="student-label">Welcome Back</div>
     <input class="student-input" id="loginId" type="text" placeholder="Student ID" maxlength="20" inputmode="numeric">
     <div style="height:12px"></div>
@@ -535,8 +538,8 @@ function closeStudent() {
 var API = 'https://api.usepicky.live';
 
 function showTab(tab) {
-  document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
-  document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('registerForm').style.display = tab === 'register' ? 'flex' : 'none';
+  document.getElementById('loginForm').style.display = tab === 'login' ? 'flex' : 'none';
   document.getElementById('tabRegister').style.background = tab === 'register' ? 'rgba(255,255,255,0.12)' : 'transparent';
   document.getElementById('tabRegister').style.color = tab === 'register' ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.35)';
   document.getElementById('tabLogin').style.background = tab === 'login' ? 'rgba(255,255,255,0.12)' : 'transparent';
