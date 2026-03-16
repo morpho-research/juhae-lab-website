@@ -585,7 +585,18 @@ async function doLogin() {
     });
     var data = await res.json();
     if (data.ok) {
-      window.location.href = API + '/?session_id=' + data.session_id + '&name=' + encodeURIComponent(data.name);
+      // Check if session is converged → go to results, else continue picking
+      try {
+        var statsRes = await fetch(API + '/api/continuous/stats?session_id=' + data.session_id);
+        var stats = await statsRes.json();
+        if (stats.converged) {
+          window.location.href = API + '/results?session=' + data.session_id;
+        } else {
+          window.location.href = API + '/?session_id=' + data.session_id + '&name=' + encodeURIComponent(data.name);
+        }
+      } catch(e2) {
+        window.location.href = API + '/?session_id=' + data.session_id + '&name=' + encodeURIComponent(data.name);
+      }
     } else {
       showError(data.error || 'Login failed');
     }
