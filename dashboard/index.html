@@ -195,6 +195,7 @@ async function checkDashPass(){
 }
 document.getElementById('dashPass').addEventListener('keydown',function(e){if(e.key==='Enter')checkDashPass();});
 if(sessionStorage.getItem('dash_auth')==='1')document.getElementById('lockOverlay').style.display='none';
+setInterval(function(){if(sessionStorage.getItem('dash_auth')!=='1'){document.getElementById('lockOverlay').style.display='flex';}},5000);
 </script>
 
 <a href="/" class="back">< back</a>
