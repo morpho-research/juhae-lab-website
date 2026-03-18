@@ -595,10 +595,10 @@ async function doLogin() {
         if (stats.converged) {
           window.location.href = API + '/results?session=' + data.session_id;
         } else {
-          window.location.href = API + '/?session_id=' + data.session_id + '&name=' + encodeURIComponent(data.name);
+          window.location.href = API + '/survey/pre?group=experimental&pid=' + encodeURIComponent(sid) + '&name=' + encodeURIComponent(data.name) + '&session_id=' + data.session_id;
         }
       } catch(e2) {
-        window.location.href = API + '/?session_id=' + data.session_id + '&name=' + encodeURIComponent(data.name);
+        window.location.href = API + '/survey/pre?group=experimental&pid=' + encodeURIComponent(sid) + '&name=' + encodeURIComponent(data.name) + '&session_id=' + data.session_id;
       }
     } else {
       showError(data.error || 'Login failed');
