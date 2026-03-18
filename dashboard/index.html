@@ -177,6 +177,26 @@ header h1 { font-size: 20px; font-weight: 700; letter-spacing: 6px; text-transfo
 </head>
 <body>
 
+<div id="lockOverlay" style="position:fixed;inset:0;background:#000;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Effra',sans-serif;">
+  <div style="font-size:24px;font-weight:900;color:#fff;margin-bottom:20px;">Dashboard Locked</div>
+  <input id="dashPass" type="password" placeholder="Passcode" maxlength="4" inputmode="numeric" style="background:#111;border:1px solid #333;border-radius:12px;color:#fff;font-size:18px;padding:14px 20px;width:200px;text-align:center;outline:none;font-family:'Effra',sans-serif;">
+  <button onclick="checkDashPass()" style="margin-top:16px;padding:12px 40px;border-radius:22px;background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.08);font-size:12px;font-weight:700;letter-spacing:3px;cursor:pointer;font-family:'Effra',sans-serif;">ENTER</button>
+  <div id="dashError" style="color:#e74c3c;margin-top:12px;font-size:13px;display:none;">Wrong passcode</div>
+</div>
+<script>
+async function checkDashPass(){
+  var v=document.getElementById('dashPass').value;
+  var buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(v));
+  var h=Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0')}).join('');
+  if(h==='03aaef0fd45d47ee37afee60b41f0a80010f58f95d3d34e9b7dc253c8558bf2a'){
+    document.getElementById('lockOverlay').style.display='none';
+    sessionStorage.setItem('dash_auth','1');
+  }else{document.getElementById('dashError').style.display='block';}
+}
+document.getElementById('dashPass').addEventListener('keydown',function(e){if(e.key==='Enter')checkDashPass();});
+if(sessionStorage.getItem('dash_auth')==='1')document.getElementById('lockOverlay').style.display='none';
+</script>
+
 <a href="/" class="back">< back</a>
 
 <header>
