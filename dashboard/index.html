@@ -107,30 +107,32 @@ header h1 { font-size: 20px; font-weight: 700; letter-spacing: 6px; text-transfo
 .tag-ready { background: #1a1a0a; color: #aa8; border: 1px solid #2a2a1a; }
 .tag-blocked { background: #1a0a0a; color: #a44; border: 1px solid #2a1a1a; }
 
-.phase {
+.session-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 5px 0;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
   font-size: 12px;
+  gap: 8px;
 }
-.phase-name { flex: 1; color: #666; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.phase-bar { flex: 0 0 80px; background: rgba(0,0,0,0.1); border-radius: 4px; height: 8px; overflow: hidden; }
-.phase-fill { background: #000; height: 100%; border-radius: 4px; }
-.phase-count { color: #333; font-size: 11px; min-width: 30px; text-align: right; }
-
-.agent {
-  padding: 10px;
-  background: rgba(0,0,0,0.03);
-  border: 1px solid #eee;
-  border-radius: 12px;
-  margin-bottom: 8px;
-  font-size: 12px;
+.session-row:last-child { border: none; }
+.session-name { flex: 1; color: #000; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.session-stats { color: #666; font-size: 11px; white-space: nowrap; }
+.session-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
-.agent-id { color: #000; font-weight: 600; }
-.agent-detail { color: #888; margin-top: 4px; }
-
-.next-item { padding: 6px 0; font-size: 12px; color: #444; border-bottom: 1px solid #080808; }
+.badge-converged { background: #e8f5e9; color: #2e7d32; }
+.badge-active { background: #e3f2fd; color: #1565c0; }
+.badge-empty { background: #f5f5f5; color: #999; }
+.badge-pre { background: #fff3e0; color: #e65100; }
+.badge-post { background: #e8f5e9; color: #2e7d32; }
 
 .meta { color: #222; font-size: 11px; text-align: center; margin-top: 30px; letter-spacing: 2px; }
 
@@ -159,9 +161,9 @@ header h1 { font-size: 20px; font-weight: 700; letter-spacing: 6px; text-transfo
   background: #ff453a;
   animation: urgentpulse 0.6s infinite;
 }
-.status-dot.done {
-  background: rgba(255,255,255,0.5);
-  animation: pulse 4s infinite;
+.status-dot.offline {
+  background: #888;
+  animation: none;
 }
 @keyframes urgentpulse {
   0%, 100% { opacity: 1; }
@@ -191,6 +193,7 @@ async function checkDashPass(){
   if(h==='03aaef0fd45d47ee37afee60b41f0a80010f58f95d3d34e9b7dc253c8558bf2a'){
     document.getElementById('lockOverlay').style.display='none';
     sessionStorage.setItem('dash_auth','1');
+    loadDashboard();
   }else{document.getElementById('dashError').style.display='block';}
 }
 document.getElementById('dashPass').addEventListener('keydown',function(e){if(e.key==='Enter')checkDashPass();});
@@ -198,48 +201,22 @@ if(sessionStorage.getItem('dash_auth')==='1')document.getElementById('lockOverla
 setInterval(function(){if(sessionStorage.getItem('dash_auth')!=='1'){document.getElementById('lockOverlay').style.display='flex';}},5000);
 </script>
 
-<a href="/" class="back">< back</a>
+<a href="/" class="back">&lt; back</a>
 
 <header>
-  <h1><span class="status-dot"></span>Dashboard</h1>
+  <h1><span class="status-dot" id="status-dot"></span>Dashboard</h1>
 </header>
 
 <div class="grid">
 
 <div class="card">
-  <h2>Image Generation</h2>
-  <div class="big" id="total-img">--<span> / 3000</span></div>
-  <div class="progress-outer"><div class="progress-inner" id="img-progress"></div></div>
-  <div class="row"><span class="row-label">This laptop</span><span class="row-value" id="bulk-stat">--</span></div>
-  <div class="row"><span class="row-label">Factory</span><span class="row-value" id="fctry-stat">--</span></div>
-  <div class="row"><span class="row-label">ETA</span><span class="row-value highlight" id="eta">--</span></div>
-  <div class="row"><span class="row-label">Latest</span><span class="row-value" id="latest">--</span></div>
-</div>
-
-<div class="card">
-  <h2>Tasks</h2>
-  <div style="margin-bottom:12px">
-    <span class="tag tag-done" id="tag-done">--</span>
-    <span class="tag tag-active" id="tag-active">--</span>
-    <span class="tag tag-ready" id="tag-ready">--</span>
-    <span class="tag tag-blocked" id="tag-blocked">--</span>
-  </div>
-  <div class="progress-outer"><div class="progress-inner" id="task-progress"></div></div>
-</div>
-
-<div class="card" style="grid-column: 1 / -1;">
-  <h2>Active Agents</h2>
-  <div id="agents" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:8px;">--</div>
-</div>
-
-<div class="card">
-  <h2>Phases</h2>
-  <div id="phases">--</div>
-</div>
-
-<div class="card">
-  <h2>Next Up</h2>
-  <div id="next-up">--</div>
+  <h2>Experiment Overview</h2>
+  <div class="big" id="stat-students">--<span> students</span></div>
+  <div class="progress-outer"><div class="progress-inner" id="converge-progress"></div></div>
+  <div class="row"><span class="row-label">Sessions</span><span class="row-value" id="stat-sessions">--</span></div>
+  <div class="row"><span class="row-label">Converged</span><span class="row-value highlight" id="stat-converged">--</span></div>
+  <div class="row"><span class="row-label">Total Decisions</span><span class="row-value" id="stat-decisions">--</span></div>
+  <div class="row"><span class="row-label">Likes / Passes</span><span class="row-value" id="stat-likespass">--</span></div>
 </div>
 
 <div class="card">
@@ -247,128 +224,132 @@ setInterval(function(){if(sessionStorage.getItem('dash_auth')!=='1'){document.ge
   <div id="surveys">--</div>
 </div>
 
-<div class="card">
-  <h2>Papers</h2>
-  <div class="row"><span class="row-label">Paper 1 - Prompt Literacy</span><span class="row-value">Draft (~7200w)</span></div>
-  <div class="row"><span class="row-label">Paper 2 - Taste Structure</span><span class="row-value">Skeleton</span></div>
-  <div class="row"><span class="row-label">Paper 3 - LoRA</span><span class="row-value">Skeleton</span></div>
-</div>
-
-<div class="card">
-  <h2>Action Plan</h2>
-  <div class="row"><span class="row-label">Pilot Test (5-8 students)</span><span class="row-value">Monday</span></div>
-  <div class="row"><span class="row-label">Main Experiment (65 students)</span><span class="row-value">This week</span></div>
-  <div class="row"><span class="row-label">IJADE Submission</span><span class="row-value">This week</span></div>
-  <div class="row"><span class="row-label">Korean Journal</span><span class="row-value">Apr 10</span></div>
-  <div class="row"><span class="row-label">Domain Transfer</span><span class="row-value">Pending</span></div>
+<div class="card" style="grid-column: 1 / -1;">
+  <h2>Sessions <span id="session-count" style="color:#999;font-weight:300;font-size:10px;letter-spacing:1px;"></span></h2>
+  <div id="sessions-list" style="max-height: 500px; overflow-y: auto;">--</div>
 </div>
 
 </div>
 
 <div style="text-align:center; margin-top:24px;">
-  <a href="https://test.usepicky.live" style="display:inline-block; padding:14px 36px; border-radius:22px; background:rgba(255,255,255,0.08); backdrop-filter:blur(40px); -webkit-backdrop-filter:blur(40px); color:rgba(255,255,255,0.7); font-family:'Effra',sans-serif; font-weight:700; font-size:12px; letter-spacing:3px; text-decoration:none; text-transform:uppercase; border:1px solid rgba(255,255,255,0.1); transition:all 0.2s;">MORPHO</a>
+  <a href="https://test.usepicky.live" style="display:inline-block; padding:14px 36px; border-radius:22px; background:rgba(255,255,255,0.08); backdrop-filter:blur(40px); -webkit-backdrop-filter:blur(40px); color:rgba(255,255,255,0.7); font-family:'Effra',sans-serif; font-weight:700; font-size:12px; letter-spacing:3px; text-decoration:none; text-transform:uppercase; border:1px solid rgba(255,255,255,0.1); transition:all 0.2s;">PICKY</a>
 </div>
 
 <div class="meta" id="time">--</div>
 
 <script>
-// Static data - last updated 2026-03-15 15:43
-var d = {
-  time: '2026-03-16 21:15',
-  images: { total: 9784, target: 20000, pct: 48, bulk: 1378, bulk_speed: 71, fctry: 8406, fctry_speed: 240, eta: '04:46 (~31h 31m)', latest_cat: 'wine glass', latest_style: 'cottagecore rustic' },
-  tasks: { done: 40, in_progress: 3, ready: 3, blocked: 2 },
-  total_tasks: 48,
-  sessions: [{ name: 'Helen', session_id: 1001, liked: 3, passed: 45, total: 48, participant_group: 'experimental', created_at: '2026-03-15T10:56:55.807563+00:00' }, { name: 'DuDu', session_id: 1002, liked: 16, passed: 32, total: 48, participant_group: 'experimental', created_at: '2026-03-15T11:01:20.391634+00:00' }, { name: 'Test01', session_id: 1003, liked: 10, passed: 38, total: 48, participant_group: 'experimental', created_at: '2026-03-15T11:06:28.817375+00:00' }, { name: 'Test02', session_id: 1004, liked: 36, passed: 58, total: 94, participant_group: 'experimental', created_at: '2026-03-15T11:10:25.051700+00:00' }, { name: 'Dad', session_id: 1005, liked: 30, passed: 6, total: 36, participant_group: 'experimental', created_at: '2026-03-15T11:19:34.631096+00:00' }, { name: 'Test03', session_id: 1006, liked: 30, passed: 52, total: 82, participant_group: 'experimental', created_at: '2026-03-15T11:24:30.866052+00:00' }, { name: 'Test 11', session_id: 1007, liked: 30, passed: 65, total: 95, participant_group: 'experimental', created_at: '2026-03-15T12:12:38.718159+00:00' }, { name: 'Test22', session_id: 1011, liked: 64, passed: 58, total: 122, participant_group: 'experimental', created_at: '2026-03-16T00:22:51.677706+00:00' }, { name: 'Test22', session_id: 1012, liked: 1, passed: 0, total: 1, participant_group: 'experimental', created_at: '2026-03-16T00:30:09.116313+00:00' }, { name: 'Test88', session_id: 1013, liked: 40, passed: 32, total: 72, participant_group: 'experimental', created_at: '2026-03-16T00:30:36.265774+00:00' }, { name: 'Test55', session_id: 1014, liked: 30, passed: 35, total: 65, participant_group: 'experimental', created_at: '2026-03-16T00:39:42.018117+00:00' }, { name: 'algo_test', session_id: 1015, liked: 7, passed: 63, total: 70, participant_group: 'experimental', created_at: '2026-03-16T01:02:26.122284+00:00' }, { name: 'Tesj555', session_id: 1016, liked: 30, passed: 14, total: 44, participant_group: 'experimental', created_at: '2026-03-16T01:26:33.749842+00:00' }, { name: 'Test99', session_id: 1017, liked: 30, passed: 34, total: 64, participant_group: 'experimental', created_at: '2026-03-16T01:54:24.317042+00:00' }, { name: 'Ddsd', session_id: 1018, liked: 30, passed: 9, total: 39, participant_group: 'experimental', created_at: '2026-03-16T04:26:43.244037+00:00' }, { name: 'Dddd', session_id: 1019, liked: 30, passed: 7, total: 37, participant_group: 'experimental', created_at: '2026-03-16T04:43:00.487741+00:00' }, { name: 'Ju Hae Lee (219890)', session_id: 1020, liked: 1, passed: 0, total: 1, participant_group: 'experimental', created_at: '2026-03-16T04:46:49.286594+00:00' }, { name: '이주회', session_id: 1021, liked: 30, passed: 0, total: 30, participant_group: 'experimental', created_at: '2026-03-16T04:47:52.883605+00:00' }, { name: '이주회', session_id: 1022, liked: 0, passed: 0, total: 0, participant_group: 'experimental', created_at: '2026-03-16T04:49:55.275504+00:00' }, { name: 'Saeyeon Hong (202302211)', session_id: 1023, liked: 0, passed: 0, total: 0, participant_group: 'experimental', created_at: '2026-03-16T06:42:28.076346+00:00' }, { name: 'kimsuhyun (202402139)', session_id: 1024, liked: 30, passed: 150, total: 180, participant_group: 'experimental', created_at: '2026-03-16T06:42:31.790926+00:00' }, { name: 'Lee Jeong Chan (202405143)', session_id: 1025, liked: 0, passed: 0, total: 0, participant_group: 'experimental', created_at: '2026-03-16T06:42:43.400660+00:00' }, { name: 'leeyubin (202402159)', session_id: 1026, liked: 0, passed: 0, total: 0, participant_group: 'experimental', created_at: '2026-03-16T06:42:50.239767+00:00' }, { name: 'Nayoonha (202402143)', session_id: 1027, liked: 0, passed: 0, total: 0, participant_group: 'experimental', created_at: '2026-03-16T06:42:50.492292+00:00' }, { name: 'SOOWAN KIM (202302179)', session_id: 1028, liked: 30, passed: 103, total: 133, participant_group: 'experimental', created_at: '2026-03-16T06:43:00.796154+00:00' }, { name: 'KimRaon (202302175)', session_id: 1029, liked: 7, passed: 56, total: 63, participant_group: 'experimental', created_at: '2026-03-16T06:43:10.886105+00:00' }, { name: 'Ju Hae Lee (210890)', session_id: 1030, liked: 0, passed: 0, total: 0, participant_group: 'experimental', created_at: '2026-03-16T06:43:17.808323+00:00' }, { name: 'Gunu Chai (202405147)', session_id: 1031, liked: 0, passed: 0, total: 0, participant_group: 'experimental', created_at: '2026-03-16T06:43:19.539076+00:00' }, { name: 'Jo Seong Bin (202405145)', session_id: 1032, liked: 0, passed: 0, total: 0, participant_group: 'experimental', created_at: '2026-03-16T06:43:20.404605+00:00' }, { name: 'Kim seo yeong (202302177)', session_id: 1033, liked: 0, passed: 0, total: 0, participant_group: 'experimental', created_at: '2026-03-16T06:43:21.324826+00:00' }, { name: 'Youn (202402153)', session_id: 1034, liked: 0, passed: 0, total: 0, participant_group: 'experimental', created_at: '2026-03-16T06:43:21.882764+00:00' }, { name: 'TaeIn (202402145)', session_id: 1035, liked: 0, passed: 0, total: 0, participant_group: 'experimental', created_at: '2026-03-16T06:43:23.847190+00:00' }, { name: 'Kim Ji Soo (202402141)', session_id: 1036, liked: 0, passed: 0, total: 0, participant_group: 'experimental', created_at: '2026-03-16T06:43:26.626585+00:00' }, { name: 'Da Yeong Hwang (202402169)', session_id: 1037, liked: 30, passed: 191, total: 221, participant_group: 'experimental', created_at: '2026-03-16T06:43:27.626137+00:00' }, { name: 'Nayugyeong (202402104)', session_id: 1038, liked: 0, passed: 0, total: 0, participant_group: 'experimental', created_at: '2026-03-16T06:43:28.179680+00:00' }, { name: 'minseo (57176649)', session_id: 1039, liked: 0, passed: 0, total: 0, participant_group: 'experimental', created_at: '2026-03-16T06:44:34.602900+00:00' }, { name: 'minseo (130613)', session_id: 1040, liked: 0, passed: 0, total: 0, participant_group: 'experimental', created_at: '2026-03-16T06:44:54.074114+00:00' }, { name: '이주회', session_id: 1041, liked: 30, passed: 43, total: 73, participant_group: 'experimental', created_at: '2026-03-16T06:45:04.726702+00:00' }, { name: 'TaeIn', session_id: 1042, liked: 30, passed: 161, total: 191, participant_group: 'experimental', created_at: '2026-03-16T06:45:18.712234+00:00' }, { name: '나윤하', session_id: 1043, liked: 0, passed: 0, total: 0, participant_group: 'experimental', created_at: '2026-03-16T06:45:37.605273+00:00' }, { name: '나윤하', session_id: 1044, liked: 30, passed: 20, total: 50, participant_group: 'experimental', created_at: '2026-03-16T06:45:39.424041+00:00' }, { name: 'leeyubin', session_id: 1045, liked: 30, passed: 246, total: 276, participant_group: 'experimental', created_at: '2026-03-16T06:45:44.057789+00:00' }, { name: 'kimsuhyun', session_id: 1046, liked: 19, passed: 69, total: 88, participant_group: 'experimental', created_at: '2026-03-16T06:45:57.574236+00:00' }, { name: 'Youn', session_id: 1047, liked: 30, passed: 57, total: 87, participant_group: 'experimental', created_at: '2026-03-16T06:47:09.161276+00:00' }, { name: 'yenacheon (202402167)', session_id: 1048, liked: 0, passed: 0, total: 0, participant_group: 'experimental', created_at: '2026-03-16T06:47:26.677661+00:00' }, { name: 'Gunu Chai', session_id: 1049, liked: 30, passed: 55, total: 85, participant_group: 'experimental', created_at: '2026-03-16T06:48:26.982111+00:00' }, { name: '이정찬', session_id: 1050, liked: 30, passed: 71, total: 101, participant_group: 'experimental', created_at: '2026-03-16T06:48:51.531132+00:00' }, { name: 'yenacheon', session_id: 1051, liked: 30, passed: 40, total: 70, participant_group: 'experimental', created_at: '2026-03-16T06:50:27.379082+00:00' }, { name: 'Jo Seong Bin', session_id: 1052, liked: 30, passed: 93, total: 123, participant_group: 'experimental', created_at: '2026-03-16T06:53:47.589963+00:00' }, { name: 'Kim seo yeong', session_id: 1053, liked: 0, passed: 0, total: 0, participant_group: 'experimental', created_at: '2026-03-16T06:54:23.053848+00:00' }, { name: 'Kim seo yeong', session_id: 1054, liked: 30, passed: 95, total: 125, participant_group: 'experimental', created_at: '2026-03-16T06:54:24.812477+00:00' }, { name: 'Nayugyeong', session_id: 1055, liked: 30, passed: 51, total: 81, participant_group: 'experimental', created_at: '2026-03-16T06:55:31.493914+00:00' }, { name: '이주회', session_id: 1056, liked: 2, passed: 1, total: 3, participant_group: 'experimental', created_at: '2026-03-16T07:07:35.751726+00:00' }, { name: 'Da Teing', session_id: 1057, liked: 0, passed: 0, total: 0, participant_group: 'experimental', created_at: '2026-03-16T07:08:12.619659+00:00' }, { name: 'Da Teing', session_id: 1058, liked: 0, passed: 0, total: 0, participant_group: 'experimental', created_at: '2026-03-16T07:08:12.784746+00:00' }, { name: 'Saeyeon Hong', session_id: 1059, liked: 30, passed: 135, total: 165, participant_group: 'experimental', created_at: '2026-03-16T07:08:16.686822+00:00' }, { name: 'kangminseo (202402133)', session_id: 1060, liked: 0, passed: 0, total: 0, participant_group: 'experimental', created_at: '2026-03-16T07:08:22.549464+00:00' }, { name: 'Kim Ji Soo', session_id: 1061, liked: 30, passed: 99, total: 129, participant_group: 'experimental', created_at: '2026-03-16T07:09:02.644128+00:00' }, { name: '강민서', session_id: 1062, liked: 30, passed: 29, total: 59, participant_group: 'experimental', created_at: '2026-03-16T07:10:38.291245+00:00' }, { name: 'Gggh (55)', session_id: 1063, liked: 0, passed: 0, total: 0, participant_group: 'experimental', created_at: '2026-03-16T09:04:37.562431+00:00' }, { name: 'Fghj', session_id: 1064, liked: 30, passed: 9, total: 39, participant_group: 'experimental', created_at: '2026-03-16T09:05:30.078001+00:00' }],
-  surveys: { experimental: { pre: 19, post: 13 }, control: { pre: 0, post: 0 } },
-  status: 'error',
-  active: [
-    { id: 1, name: 'Experiment Monitor', detail: 'Class 1 in progress, Class 2-4 upcoming', status: 'working' },
-    { id: 2, name: 'Data Analysis', detail: '61 students, 25 analyses done', status: 'done' },
-    { id: 3, name: 'Similarity Engine', detail: '6,561 images, real-time scoring', status: 'done' },
-    { id: 4, name: 'Survey System', detail: 'pre:19 post:13', status: 'working' },
-    { id: 5, name: 'Paper Writing', detail: '3 papers, IJTDE/IJDesign/IJHCS', status: 'working' },
-    { id: 6, name: 'Image Generation', detail: '9784 images, target 20,000', status: 'working' }
-  ],
-  phases: {
-    'Image Generation': { done: 1, total: 3 },
-    'System Preparation': { done: 6, total: 6 },
-    'Paper 1': { done: 11, total: 12 },
-    'Analysis Scripts': { done: 3, total: 3 },
-    'Experiment': { done: 0, total: 5 },
-    'Paper 2 - Taste': { done: 3, total: 3 },
-    'Paper 3 - LoRA': { done: 3, total: 3 },
-    'Submission': { done: 3, total: 5 }
-  },
-  next_up: [
-    { id: 'E1', name: 'Pilot test (Monday)' },
-    { id: 'E2', name: 'Fix pilot issues' },
-    { id: 'E3', name: 'Main experiment (65 students)' }
-  ]
-};
+var API_BASE = 'https://api.usepicky.live';
+var _refreshTimer = null;
 
-document.getElementById('time').textContent = d.time + ' | static snapshot';
-document.getElementById('total-img').innerHTML = d.images.total + '<span> / ' + d.images.target + '</span>';
-document.getElementById('img-progress').style.width = d.images.pct + '%';
-document.getElementById('bulk-stat').textContent = d.images.bulk + ' imgs | ' + d.images.bulk_speed + '/hr';
-document.getElementById('fctry-stat').textContent = d.images.fctry + ' imgs | ' + d.images.fctry_speed + '/hr';
-document.getElementById('eta').textContent = d.images.eta;
-document.getElementById('latest').textContent = d.images.latest_cat + ' | ' + d.images.latest_style;
-
-document.getElementById('tag-done').textContent = 'done ' + d.tasks.done;
-document.getElementById('tag-active').textContent = 'active ' + d.tasks.in_progress;
-document.getElementById('tag-ready').textContent = 'ready ' + d.tasks.ready;
-document.getElementById('tag-blocked').textContent = 'blocked ' + d.tasks.blocked;
-document.getElementById('task-progress').style.width = (d.tasks.done / d.total_tasks * 100) + '%';
-
-var a = '';
-d.active.forEach(function(x) {
-  var dotClass = x.status === 'working' ? '' : (x.status === 'error' ? ' error' : ' done');
-  var statusLabel = x.status === 'working' ? 'working' : (x.status === 'done' ? 'done' : x.status);
-  a += '<div class="agent">'
-     + '<div style="display:flex;align-items:center;justify-content:space-between;">'
-     + '<span class="agent-id">Agent ' + x.id + '</span>'
-     + '<span style="font-size:10px;color:#888;display:flex;align-items:center;gap:4px;">'
-     + '<span class="status-dot' + dotClass + '" style="position:static;width:5px;height:5px;margin:0;"></span>' + statusLabel + '</span>'
-     + '</div>'
-     + '<div style="margin-top:6px;font-weight:600;font-size:12px;color:#000;">' + x.name + '</div>'
-     + '<div class="agent-detail">' + x.detail + '</div>'
-     + '</div>';
-});
-document.getElementById('agents').innerHTML = a;
-
-var p = '';
-for (var k in d.phases) {
-  var v = d.phases[k];
-  var pct = v.total > 0 ? (v.done / v.total * 100) : 0;
-  p += '<div class="phase"><span class="phase-name">' + k + '</span><div class="phase-bar"><div class="phase-fill" style="width:' + pct + '%"></div></div><span class="phase-count">' + v.done + '/' + v.total + '</span></div>';
-}
-document.getElementById('phases').innerHTML = p;
-
-var n = '';
-d.next_up.forEach(function(x) {
-  n += '<div class="next-item">[' + x.id + '] ' + x.name + '</div>';
-});
-document.getElementById('next-up').innerHTML = n;
-
-// Surveys
-if (d.surveys) {
-  var sv = '';
-  sv += '<div class="row"><span class="row-label">Experimental Pre</span><span class="row-value">' + (d.surveys.experimental ? d.surveys.experimental.pre : 0) + '</span></div>';
-  sv += '<div class="row"><span class="row-label">Experimental Post</span><span class="row-value">' + (d.surveys.experimental ? d.surveys.experimental.post : 0) + '</span></div>';
-  sv += '<div class="row"><span class="row-label">Control Pre</span><span class="row-value">' + (d.surveys.control ? d.surveys.control.pre : 0) + '</span></div>';
-  sv += '<div class="row"><span class="row-label">Control Post</span><span class="row-value">' + (d.surveys.control ? d.surveys.control.post : 0) + '</span></div>';
-  document.getElementById('surveys').innerHTML = sv;
+function formatTime() {
+  var now = new Date();
+  var y = now.getFullYear();
+  var mo = String(now.getMonth() + 1).padStart(2, '0');
+  var d = String(now.getDate()).padStart(2, '0');
+  var h = String(now.getHours()).padStart(2, '0');
+  var mi = String(now.getMinutes()).padStart(2, '0');
+  var s = String(now.getSeconds()).padStart(2, '0');
+  return y + '-' + mo + '-' + d + ' ' + h + ':' + mi + ':' + s;
 }
 
-// Surveys
-if (d.surveys) {
-  var sv = '';
-  sv += '<div class="row"><span class="row-label">Experimental - Pre</span><span class="row-value">' + d.surveys.experimental.pre + '</span></div>';
-  sv += '<div class="row"><span class="row-label">Experimental - Post</span><span class="row-value">' + d.surveys.experimental.post + '</span></div>';
-  sv += '<div class="row"><span class="row-label">Control - Pre</span><span class="row-value">' + d.surveys.control.pre + '</span></div>';
-  sv += '<div class="row"><span class="row-label">Control - Post</span><span class="row-value">' + d.surveys.control.post + '</span></div>';
-  document.getElementById('surveys').innerHTML = sv;
+async function fetchJSON(url) {
+  var resp = await fetch(url);
+  if (!resp.ok) throw new Error('HTTP ' + resp.status);
+  return resp.json();
 }
+
+async function loadDashboard() {
+  var dot = document.getElementById('status-dot');
+  try {
+    var stats = await fetchJSON(API_BASE + '/api/dashboard/stats');
+    var sessions = await fetchJSON(API_BASE + '/api/dashboard/sessions');
+
+    dot.className = 'status-dot';
+
+    // --- Overview card ---
+    document.getElementById('stat-students').innerHTML = stats.total_students + '<span> students</span>';
+    document.getElementById('stat-sessions').textContent = stats.total_sessions;
+    document.getElementById('stat-converged').textContent = stats.converged + ' / ' + stats.total_sessions;
+    document.getElementById('stat-decisions').textContent = stats.total_decisions.toLocaleString();
+    document.getElementById('stat-likespass').textContent = stats.total_likes + ' / ' + stats.total_passes;
+
+    var convergePct = stats.total_sessions > 0 ? (stats.converged / stats.total_sessions * 100) : 0;
+    document.getElementById('converge-progress').style.width = Math.min(100, convergePct) + '%';
+
+    // --- Surveys card ---
+    var sv = '';
+    sv += '<div class="row"><span class="row-label">Experimental - Pre</span><span class="row-value">' + stats.surveys.experimental.pre + '</span></div>';
+    sv += '<div class="row"><span class="row-label">Experimental - Post</span><span class="row-value">' + stats.surveys.experimental.post + '</span></div>';
+    sv += '<div class="row"><span class="row-label">Control - Pre</span><span class="row-value">' + stats.surveys.control.pre + '</span></div>';
+    sv += '<div class="row"><span class="row-label">Control - Post</span><span class="row-value">' + stats.surveys.control.post + '</span></div>';
+    var totalSurveys = stats.surveys.experimental.pre + stats.surveys.experimental.post + stats.surveys.control.pre + stats.surveys.control.post;
+    sv += '<div class="row" style="border-top:1px solid #ddd;margin-top:4px;padding-top:10px;"><span class="row-label" style="font-weight:600;color:#333;">Total</span><span class="row-value highlight">' + totalSurveys + '</span></div>';
+    document.getElementById('surveys').innerHTML = sv;
+
+    // --- Sessions list ---
+    // Filter out sessions with 0 decisions to reduce noise, unless they have surveys
+    var activeSessions = sessions.filter(function(s) {
+      return s.total > 0 || s.pre_survey || s.post_survey;
+    });
+
+    document.getElementById('session-count').textContent = '(' + activeSessions.length + ' active)';
+
+    var html = '';
+    activeSessions.forEach(function(s) {
+      var badge = '';
+      if (s.converged) {
+        badge = '<span class="session-badge badge-converged">DONE</span>';
+      } else if (s.total > 0) {
+        badge = '<span class="session-badge badge-active">IN PROGRESS</span>';
+      } else {
+        badge = '<span class="session-badge badge-empty">REGISTERED</span>';
+      }
+
+      var surveyBadges = '';
+      if (s.pre_survey) surveyBadges += '<span class="session-badge badge-pre" style="margin-left:3px;">PRE</span>';
+      if (s.post_survey) surveyBadges += '<span class="session-badge badge-post" style="margin-left:3px;">POST</span>';
+
+      var modeLabel = '';
+      if (s.experiment_mode) {
+        modeLabel = '<span style="color:#aaa;font-size:10px;margin-left:4px;">(' + s.experiment_mode + ')</span>';
+      }
+
+      var statsText = '';
+      if (s.total > 0) {
+        statsText = s.liked + '/' + s.total;
+      }
+
+      html += '<div class="session-row">'
+            + '<span class="session-name">' + (s.name || 'Unknown') + modeLabel + '</span>'
+            + '<span class="session-stats">' + statsText + '</span>'
+            + surveyBadges
+            + badge
+            + '</div>';
+    });
+
+    if (!html) html = '<div style="color:#999;font-size:12px;">No sessions yet</div>';
+    document.getElementById('sessions-list').innerHTML = html;
+
+    // --- Timestamp ---
+    document.getElementById('time').textContent = formatTime() + ' | live';
+
+  } catch (err) {
+    dot.className = 'status-dot offline';
+    document.getElementById('time').textContent = formatTime() + ' | offline - ' + err.message;
+  }
+}
+
+// Initial load when authenticated
+if (sessionStorage.getItem('dash_auth') === '1') {
+  loadDashboard();
+}
+
+// Auto-refresh every 30 seconds
+_refreshTimer = setInterval(function() {
+  if (sessionStorage.getItem('dash_auth') === '1') {
+    loadDashboard();
+  }
+}, 30000);
 </script>
 </body>
 </html>
