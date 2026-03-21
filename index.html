@@ -598,16 +598,15 @@ async function doLogin() {
     });
     var data = await res.json();
     if (data.ok) {
-      // Check if session is converged → go to results, else continue picking
-      try {
-        var statsRes = await fetch(API + '/api/continuous/stats?session_id=' + data.session_id);
-        var stats = await statsRes.json();
-        if (stats.converged) {
-          window.location.href = API + '/results?session=' + data.session_id;
-        } else {
-          window.location.href = API + '/survey/pre?group=experimental&pid=' + encodeURIComponent(sid) + '&name=' + encodeURIComponent(data.name) + '&session_id=' + data.session_id;
-        }
-      } catch(e2) {
+      var mode = data.experiment_mode === 'random' ? '&mode=random' : '';
+      if (data.previous_converged) {
+        // Converged — go to results
+        window.location.href = API + '/results?session=' + data.session_id;
+      } else if (data.has_pre_survey) {
+        // Not converged but pre-survey done — go directly to pick
+        window.location.href = API + '/?group=experimental&pid=' + encodeURIComponent(sid) + '&session_id=' + data.session_id + mode;
+      } else {
+        // No pre-survey yet — go to survey first
         window.location.href = API + '/survey/pre?group=experimental&pid=' + encodeURIComponent(sid) + '&name=' + encodeURIComponent(data.name) + '&session_id=' + data.session_id;
       }
     } else {
