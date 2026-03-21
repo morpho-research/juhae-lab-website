@@ -568,7 +568,17 @@ async function doRegister() {
     });
     var data = await res.json();
     if (data.ok) {
-      window.location.href = API + '/survey/pre?group=experimental&pid=' + encodeURIComponent(sid) + '&name=' + encodeURIComponent(sname) + '&session_id=' + data.session_id;
+      if (data.has_pre_survey) {
+        // Pre-survey already done — go directly to pick or results
+        if (data.converged) {
+          window.location.href = API + '/results?session=' + data.session_id;
+        } else {
+          var mode = data.experiment_mode === 'random' ? '&mode=random' : '';
+          window.location.href = API + '/?group=experimental&pid=' + encodeURIComponent(sid) + '&session_id=' + data.session_id + mode;
+        }
+      } else {
+        window.location.href = API + '/survey/pre?group=experimental&pid=' + encodeURIComponent(sid) + '&name=' + encodeURIComponent(sname) + '&session_id=' + data.session_id;
+      }
     } else {
       showError(data.error || 'Registration failed');
     }
